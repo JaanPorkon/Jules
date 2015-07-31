@@ -16,9 +16,10 @@ class Controller
 
     public function __construct($path = null, $loader = null)
     {
+        $this->request = new \Jules\Http\Request();
+        $this->response = new \Jules\Http\Response();
         $this->tag = new \Jules\Mvc\Tag();
-        $this->request = new \Jules\Mvc\Http\Request();
-        $this->response = new \Jules\Mvc\Http\Response();
+
 
         if(!is_subclass_of(get_called_class(), 'Jules\Mvc\Controller'))
         {
@@ -117,7 +118,7 @@ class Controller
 
     public function Jules_GetMethodParams(&$class, $method)
     {
-        $classReflector = new ReflectionClass($class);
+        $classReflector = new \ReflectionClass($class);
         $classParams = $classReflector->getMethod($method)->getParameters();
         $classParamValues = array();
 

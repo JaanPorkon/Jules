@@ -114,15 +114,15 @@ class Tag
             $select .= '<option value="'.$options['emptyValue'].'"'.($selectedValue ? '' : ' selected="selected"').' disabled>'.$options['emptyText'].'</option>';
         }
 
-        foreach($value as $key => $value)
+        foreach($value as $key => $val)
         {
             if($value == $selectedValue)
             {
-                $select .= '<option value="'.$key.'" selected="selected">'.$value.'</option>';
+                $select .= '<option value="'.$key.'" selected="selected">'.$val.'</option>';
             }
             else
             {
-                $select .= '<option value="'.$key.'">'.$value.'</option>';
+                $select .= '<option value="'.$key.'">'.$val.'</option>';
             }
         }
 

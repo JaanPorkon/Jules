@@ -1,6 +1,6 @@
 <?php
 
-namespace Jules\Mvc\Http;
+namespace Jules\Http;
 
 class Response
 {

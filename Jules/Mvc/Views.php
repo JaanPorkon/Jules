@@ -27,7 +27,10 @@ class Views
 
     public function getContent()
     {
-        $contentFile = $this->viewsDir.str_replace('Controller', '', $this->controller->Jules_getClass()).DIRECTORY_SEPARATOR.str_replace('Action', '', $this->controller->Jules_getMethod()).'.phtml';
+        $contentFile = $this->viewsDir
+            .str_replace('Controller', '', $this->controller->Jules_getClass())
+            .DIRECTORY_SEPARATOR
+            .str_replace('Action', '', $this->controller->Jules_getMethod()).'.phtml';
 
         if(file_exists($contentFile))
         {
@@ -68,15 +71,5 @@ class Views
         ob_end_clean();
 
         return $page;
-    }
-
-    public function setTitle($string)
-    {
-
-    }
-
-    public function prependTitle($string)
-    {
-
     }
 }
