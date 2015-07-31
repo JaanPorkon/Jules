@@ -6,32 +6,48 @@ class Controller
 {
     private $__JulesClass = null;
     private $__JulesMethod = null;
-
     private $__JulesControllerDir = null;
 
     public $view = null;
     public $tag = null;
     public $response = null;
     public $request = null;
+    public $app = null;
 
-    public function __construct($path = null, $loader = null)
+    private $customVars = array();
+
+    public function __construct($path = null, $app = null)
     {
+        global $Jules_mysql;
+
         $this->request = new \Jules\Http\Request();
         $this->response = new \Jules\Http\Response();
         $this->tag = new \Jules\Mvc\Tag();
-
+        $this->app = $app;
 
         if(!is_subclass_of(get_called_class(), 'Jules\Mvc\Controller'))
         {
             $controllerDir = null;
 
-            if(!is_null($loader))
+            if(!is_null($app))
             {
-                $dirs = $loader->getDirs();
+                $dirs = $app->getDirs();
                 $controllerDir = $dirs['controllers'];
+
+                foreach($app->getLoader()->getCustomFactory() as $name => $value)
+                {
+                    $class = $value();
+
+                    if(get_class($class) == 'Jules\Db\Adapter\MySQL')
+                    {
+                        $Jules_mysql = $class;
+                    }
+
+                    $this->__set($name, $class);
+                }
             }
 
-            $this->view = new \Jules\Mvc\Views($this, $loader, $this->tag);
+            $this->view = new \Jules\Mvc\Views($this, $app, $this->tag);
 
             if(is_null($controllerDir))
             {
@@ -65,10 +81,31 @@ class Controller
         }
         else
         {
+
             $route = explode('/', substr($path, 1, strlen($path)));
 
             $this->Jules_SetClass($route[0].'Controller');
             $this->Jules_SetMethod('onConstruct');
+        }
+    }
+
+    public function __set($name, $value)
+    {
+        $this->customVars[$name] = $value;
+    }
+
+    public function __get($name)
+    {
+        $customVars = $this->customVars;
+
+        if(array_key_exists($name, $customVars))
+        {
+
+            return $customVars[$name];
+        }
+        else
+        {
+            throw new \Exception($name.' variable is missing!');
         }
     }
 
@@ -91,6 +128,7 @@ class Controller
         $className = $this->Jules_GetClass();
         $class = new $className;
         $class->tag = $this->tag;
+        $class->customVars = $this->customVars;
 
         ob_start();
 

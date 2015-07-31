@@ -5,6 +5,7 @@ namespace Jules\Mvc;
 class App
 {
     private $dirs = null;
+    private $loader = array();
 
     public function __construct($loader = null)
     {
@@ -14,6 +15,7 @@ class App
         }
         else
         {
+            $this->loader = $loader;
             $this->dirs = $loader->getDirs();
         }
     }
@@ -33,6 +35,11 @@ class App
     public function getDirs()
     {
         return $this->dirs;
+    }
+
+    public function getLoader()
+    {
+        return $this->loader;
     }
 
     public function run()
