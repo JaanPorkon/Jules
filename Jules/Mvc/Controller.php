@@ -18,7 +18,7 @@ class Controller
 
     public function __construct($path = null, $app = null)
     {
-        global $Jules_mysql;
+        global $Jules_mysql, $Jules_view;
 
         $this->request = new \Jules\Http\Request();
         $this->response = new \Jules\Http\Response();
@@ -38,7 +38,7 @@ class Controller
                 {
                     $class = $value();
 
-                    if(get_class($class) == 'Jules\Db\Adapter\MySQL')
+                    if(get_class($class) == 'Jules\Db\Adapter\Pdo\MySQL')
                     {
                         $Jules_mysql = $class;
                     }
@@ -48,6 +48,8 @@ class Controller
             }
 
             $this->view = new \Jules\Mvc\Views($this, $app, $this->tag);
+
+            $Jules_view = $this->view;
 
             if(is_null($controllerDir))
             {
@@ -83,6 +85,8 @@ class Controller
         {
 
             $route = explode('/', substr($path, 1, strlen($path)));
+
+            $this->view = $Jules_view;
 
             $this->Jules_SetClass($route[0].'Controller');
             $this->Jules_SetMethod('onConstruct');

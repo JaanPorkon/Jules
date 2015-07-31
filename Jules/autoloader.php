@@ -2,14 +2,18 @@
 
 set_include_path('.');
 
-// Init global mysqli variable
+// Init global variables
 $Jules_mysql = null;
+$Jules_view = null;
 
 // Root
 require_once('Jules.php');
 
+// Config adapters
+require_once('Config/Adapter/Ini.php');
+
 // Db Adapters
-require_once('Db/Adapter/MySQL.php');
+require_once('Db/Adapter/Pdo/MySQL.php');
 
 // Http
 require_once('Http/Curl.php');

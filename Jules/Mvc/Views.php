@@ -11,6 +11,8 @@ class Views
     private $viewsDir = null;
     private $content = null;
 
+    private $customVars = array();
+
     public function __construct($controller, $loader, $tag)
     {
         $this->controller = $controller;
@@ -35,6 +37,11 @@ class Views
         if(file_exists($contentFile))
         {
             ob_start();
+
+            foreach($this->getCustomVars() as $key => $val)
+            {
+                $$key = $val;
+            }
 
             include($contentFile);
 
@@ -71,5 +78,15 @@ class Views
         ob_end_clean();
 
         return $page;
+    }
+
+    private function getCustomVars()
+    {
+        return $this->customVars;
+    }
+
+    public function setVar($name, $value)
+    {
+        $this->customVars[$name] = $value;
     }
 }

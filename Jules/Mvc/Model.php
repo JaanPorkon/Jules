@@ -6,6 +6,7 @@ class Model
 {
     private $customVars = array();
     private $tableName = null;
+    private $error = null;
 
     public function __construct()
     {
@@ -73,23 +74,26 @@ class Model
             $result = $Jules_mysql->query($queryStr);
             $response = $result->fetchAll(\PDO::FETCH_ASSOC);
         }
-        catch(\Exception $err)
+        catch(\PDOException $err)
         {
-            throw new \Exception($err->getMessage());
+            throw $err;
         }
 
         $output = array();
 
-        foreach($response as $row)
+        if(!is_null($response))
         {
-            $modelObject = new \Jules\Mvc\ModelObject($tableName);
-
-            foreach($row as $key => $val)
+            foreach($response as $row)
             {
-                $modelObject->$key = $val;
-            }
+                $modelObject = new \Jules\Mvc\ModelObject($tableName);
 
-            $output[] = $modelObject;
+                foreach($row as $key => $val)
+                {
+                    $modelObject->$key = $val;
+                }
+
+                $output[] = $modelObject;
+            }
         }
 
         return $output;
@@ -133,9 +137,9 @@ class Model
             $result = $Jules_mysql->query($queryStr);
             $response = $result->fetchAll(\PDO::FETCH_ASSOC);
         }
-        catch(\Exception $err)
+        catch(\PDOException $err)
         {
-            throw new \Exception($err->getMessage());
+            throw $err;
         }
 
         $modelObject = new \Jules\Mvc\ModelObject($tableName);
@@ -162,34 +166,48 @@ class Model
     {
         global $Jules_mysql;
 
-        $getKeys = $Jules_mysql->query('SHOW KEYS FROM '.$this->getTableName().' WHERE Key_name = "PRIMARY"');
-        $keyName = $getKeys->fetchAll()[0]['Column_name'];
-
-        $queryStr = 'INSERT INTO '.$this->getTableName().' ';
-
-        $columns = array();
-        $values = array();
-
-        foreach($this->getCustomVars() as $key => $val)
+        try
         {
-            $columns[] = $key;
-            $values[] = ':'.$key;
+            $queryStr = 'INSERT INTO '.$this->getTableName().' ';
+
+            $columns = array();
+            $values = array();
+
+            foreach($this->getCustomVars() as $key => $val)
+            {
+                $columns[] = $key;
+                $values[] = ':'.$key;
+            }
+
+            $queryStr .= '('.join(', ', $columns).') VALUES ('.join(', ', $values).')';
+
+            $prepare = $Jules_mysql->prepare($queryStr);
+            $exec = $prepare->execute($this->getCustomVars());
+
+            $this->id = $Jules_mysql->lastInsertId();
+
+            if($exec)
+            {
+                return $this;
+            }
+            else
+            {
+                return false;
+            }
         }
-
-        $queryStr .= '('.join(', ', $columns).') VALUES ('.join(', ', $values).')';
-
-        $prepare = $Jules_mysql->prepare($queryStr);
-        $exec = $prepare->execute($this->getCustomVars());
-
-        $this->id = $Jules_mysql->lastInsertId();
-
-        if($exec)
+        catch(\PDOException $err)
         {
-            return $this;
+            $this->setMessages($err);
         }
-        else
-        {
-            return false;
-        }
+    }
+
+    private function setMessages($exception)
+    {
+        $this->error = $exception;
+    }
+
+    public function getMessages()
+    {
+        return $this->error;
     }
 }

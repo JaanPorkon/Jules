@@ -1,6 +1,6 @@
 <?php
 
-namespace Jules\Db\Adapter;
+namespace Jules\Db\Adapter\Pdo;
 
 class MySQL
 {
