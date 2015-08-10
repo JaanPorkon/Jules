@@ -13,6 +13,7 @@ class Controller
     public $response = null;
     public $request = null;
     public $app = null;
+    public $url = null;
 
     private $customVars = array();
 
@@ -73,6 +74,11 @@ class Controller
 
                 if(count($route) >= 2)
                 {
+                    if($route[1] == '')
+                    {
+                        $route[1] = 'index';
+                    }
+
                     $this->Jules_SetMethod($route[1].'Action');
                 }
                 else

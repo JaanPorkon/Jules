@@ -35,6 +35,13 @@ class Loader
 
     public function set($name, $function)
     {
+        if($name == 'url')
+        {
+            global $Jules_url;
+
+            $Jules_url = $function();
+        }
+
         $this->customFactory[$name] = $function;
     }
 

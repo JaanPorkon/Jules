@@ -4,14 +4,14 @@ namespace Jules\Http;
 
 class Request
 {
-    public function get($string)
+    public function get($string = null)
     {
-        return $this->sanitize((isset($_GET[$string]) ? $_GET[$string] : false));
+        return ($string == null ? $_GET : (isset($_GET[$string]) ? $this->sanitize($_GET[$string]) : false));
     }
 
-    public function getPost($string)
+    public function getPost($string = null)
     {
-        return (isset($_POST[$string]) ? $_POST[$string] : false);
+        return ($string == null ? $_POST : (isset($_POST[$string]) ? $this->sanitize($_POST[$string]) : false));
     }
 
     public function isPost()

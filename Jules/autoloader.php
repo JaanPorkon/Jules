@@ -5,9 +5,14 @@ set_include_path('.');
 // Init global variables
 $Jules_mysql = null;
 $Jules_view = null;
+$Jules_url = null;
 
 // Root
 require_once('Jules.php');
+
+// Uril functions
+
+require_once('Util/Url.php');
 
 // Config adapters
 require_once('Config/Adapter/Ini.php');

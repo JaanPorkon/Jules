@@ -39,6 +39,30 @@ class ModelObject
         return $this->customVars;
     }
 
+    public function remove()
+    {
+        global $Jules_mysql;
+
+        $getKeys = $Jules_mysql->query('SHOW KEYS FROM '.$this->getTableName().' WHERE Key_name = "PRIMARY"');
+        $keyName = $getKeys->fetchAll()[0]['Column_name'];
+
+        $queryStr = 'DELETE FROM '.$this->getTableName().' WHERE '.$keyName.' = :'.$keyName;
+
+        $prepare = $Jules_mysql->prepare($queryStr);
+
+        $data = $this->getCustomVars();
+        $vars = array(':'.$keyName => $data[$keyName]);
+
+        if($prepare->execute($vars))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
     public function save()
     {
         global $Jules_mysql;

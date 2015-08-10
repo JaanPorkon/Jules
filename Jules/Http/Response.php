@@ -8,4 +8,11 @@ class Response
     {
         http_response_code((int)$code);
     }
+
+    public function redirect($url)
+    {
+        global $Jules_url;
+
+        header('Location: '.$Jules_url->buildUrl($url));
+    }
 }

@@ -162,9 +162,18 @@ class Model
         return $this->customVars;
     }
 
-    public function save()
+    public function save($args = array())
     {
         global $Jules_mysql;
+
+        if(count($args) > 0)
+        {
+            $data = $args;
+        }
+        else
+        {
+            $data = $this->getCustomVars();
+        }
 
         try
         {
@@ -173,7 +182,7 @@ class Model
             $columns = array();
             $values = array();
 
-            foreach($this->getCustomVars() as $key => $val)
+            foreach($data as $key => $val)
             {
                 $columns[] = $key;
                 $values[] = ':'.$key;
@@ -182,7 +191,7 @@ class Model
             $queryStr .= '('.join(', ', $columns).') VALUES ('.join(', ', $values).')';
 
             $prepare = $Jules_mysql->prepare($queryStr);
-            $exec = $prepare->execute($this->getCustomVars());
+            $exec = $prepare->execute($data);
 
             $this->id = $Jules_mysql->lastInsertId();
 
@@ -190,14 +199,11 @@ class Model
             {
                 return $this;
             }
-            else
-            {
-                return false;
-            }
         }
         catch(\PDOException $err)
         {
-            $this->setMessages($err);
+            echo $err->getMessage();
+            return false;
         }
     }
 

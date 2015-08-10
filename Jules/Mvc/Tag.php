@@ -25,11 +25,11 @@ class Tag
     {
         if(is_null($this->preTitle))
         {
-            return '<title>'.$this->title.'</title>';
+            return '<title>'.$this->title.'</title>'.PHP_EOL;
         }
         else
         {
-            return '<title>'.$this->preTitle.$this->title.'</title>';
+            return '<title>'.$this->preTitle.$this->title.'</title>'.PHP_EOL;
         }
     }
 
@@ -43,35 +43,52 @@ class Tag
 
     public function stylesheet($href)
     {
-        return '<link rel="stylesheet" href="'.$href.'" type="text/css" />';
+        global $Jules_url;
+        $href = $Jules_url->buildUrl($href);
+        return '<link rel="stylesheet" href="'.$href.'" type="text/css" />'.PHP_EOL;
     }
 
     public function javascript($src)
     {
-        return '<scrypt type="text/javascript" src="'.$src.'"></script>';
+        global $Jules_url;
+        $src = $Jules_url->buildUrl($src);
+
+        return '<script type="text/javascript" src="'.$src.'"></script>'.PHP_EOL;
     }
 
-    public function link($href, $anchor, $targetBlank = false)
+    public function link($href, $anchor, $options = array('class' => null, 'target' => null))
     {
-        return '<a href="'.$href.'"'.($targetBlank ? ' target="_blank"' : '').'>'.$anchor.'</a>';
+        global $Jules_url;
+        $href = $Jules_url->buildUrl($href);
+
+        return '<a href="'.$href.'"'
+            .(!is_null(@$options['class']) ? ' class="'.$options['class'].'"' : '')
+            .(!is_null(@$options['target']) ? ' target="'.$options['target'].'"' : '')
+        .'>'.$anchor.'</a>';
     }
 
-    public function textField($name, $options = array('maxlength' => null, 'placeholder' => null, 'size' => null))
+    public function textField($name, $options = array('class' => null, 'maxlength' => null, 'placeholder' => null, 'size' => null))
     {
         return '<input type="text" name="'.$name.'" id="'.$name.'"'
-            .(!is_null($options['maxlength']) ? ' maxlenght="'.$options['maxlength'].'"' : '')
-            .(!is_null($options['placeholder']) ? ' placeholder="'.$options['placeholder'].'"' : '')
-            .(!is_null($options['size']) ? ' size="'.$options['size'].'"' : '')
+            .(!is_null(@$options['class']) ? ' class="'.$options['class'].'"' : '')
+            .(!is_null(@$options['maxlength']) ? ' maxlenght="'.$options['maxlength'].'"' : '')
+            .(!is_null(@$options['placeholder']) ? ' placeholder="'.$options['placeholder'].'"' : '')
+            .(!is_null(@$options['size']) ? ' size="'.$options['size'].'"' : '')
         .' />';
     }
 
-    public function submitButton($value)
+    public function submitButton($value, $options = array('class' => null))
     {
-        return '<input type="submit" value="'.$value.'" />';
+        return '<input type="submit" value="'.$value.'"'
+            .(!is_null(@$options['class']) ? ' class="'.$options['class'].'"' : '')
+        . ' />';
     }
 
     public function form($action, $method = 'post')
     {
+        global $Jules_url;
+        $action = $Jules_url->buildUrl($action);
+
         return '<form action="'.$action.'" method="'.$method.'">';
     }
 

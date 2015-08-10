@@ -13,6 +13,8 @@ class Views
 
     private $customVars = array();
 
+    private $viewDisabled = false;
+
     public function __construct($controller, $loader, $tag)
     {
         $this->controller = $controller;
@@ -27,43 +29,59 @@ class Views
         $this->content = $content;
     }
 
+    public function disableView()
+    {
+        $this->viewDisabled = true;
+    }
+
+    private function canRender()
+    {
+        return (!$this->viewDisabled ? true : false);
+    }
+
     public function getContent()
     {
-        $contentFile = $this->viewsDir
-            .str_replace('Controller', '', $this->controller->Jules_getClass())
-            .DIRECTORY_SEPARATOR
-            .str_replace('Action', '', $this->controller->Jules_getMethod()).'.phtml';
-
-        if(file_exists($contentFile))
+        if($this->canRender())
         {
-            ob_start();
+            $contentFile = $this->viewsDir
+                .str_replace('Controller', '', $this->controller->Jules_getClass())
+                .DIRECTORY_SEPARATOR
+                .str_replace('Action', '', $this->controller->Jules_getMethod()).'.phtml';
 
-            foreach($this->getCustomVars() as $key => $val)
+            if(file_exists($contentFile))
             {
-                $$key = $val;
+                ob_start();
+
+                foreach($this->getCustomVars() as $key => $val)
+                {
+                    $$key = $val;
+                }
+
+                include($contentFile);
+
+                $page = ob_get_contents();
+
+                ob_end_clean();
+
+                return $page;
             }
-
-            include($contentFile);
-
-            $page = ob_get_contents();
-
-            ob_end_clean();
-
-            return $page;
-        }
-        else
-        {
-            return $this->content;
+            else
+            {
+                return $this->content;
+            }
         }
     }
 
     private function loadContent()
     {
-        $sharedFile = $this->viewsDir.'index.phtml';
-
-        if(file_exists($sharedFile))
+        if($this->canRender())
         {
-            require_once($sharedFile);
+            $sharedFile = $this->viewsDir.'index.phtml';
+
+            if(file_exists($sharedFile))
+            {
+                require_once($sharedFile);
+            }
         }
     }
 
