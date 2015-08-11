@@ -144,12 +144,19 @@ class Model
 
         $modelObject = new \Jules\Mvc\ModelObject($tableName);
 
-        foreach($response[0] as $key => $val)
+        if(count($response) == 0)
         {
-            $modelObject->$key = $val;
+            return false;
         }
+        else
+        {
+            foreach($response[0] as $key => $val)
+            {
+                $modelObject->$key = $val;
+            }
 
-        return $modelObject;
+            return $modelObject;
+        }
     }
 
     private function getTableName()

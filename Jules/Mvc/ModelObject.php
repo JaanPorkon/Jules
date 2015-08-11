@@ -39,6 +39,11 @@ class ModelObject
         return $this->customVars;
     }
 
+    public function getVar($var)
+    {
+        return $this->customVars[$var];
+    }
+
     public function remove()
     {
         global $Jules_mysql;

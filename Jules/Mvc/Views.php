@@ -41,34 +41,31 @@ class Views
 
     public function getContent()
     {
-        if($this->canRender())
+        $contentFile = $this->viewsDir
+            .str_replace('Controller', '', $this->controller->Jules_getClass())
+            .DIRECTORY_SEPARATOR
+            .str_replace('Action', '', $this->controller->Jules_getMethod()).'.phtml';
+
+        if(file_exists($contentFile))
         {
-            $contentFile = $this->viewsDir
-                .str_replace('Controller', '', $this->controller->Jules_getClass())
-                .DIRECTORY_SEPARATOR
-                .str_replace('Action', '', $this->controller->Jules_getMethod()).'.phtml';
+            ob_start();
 
-            if(file_exists($contentFile))
+            foreach($this->getCustomVars() as $key => $val)
             {
-                ob_start();
-
-                foreach($this->getCustomVars() as $key => $val)
-                {
-                    $$key = $val;
-                }
-
-                include($contentFile);
-
-                $page = ob_get_contents();
-
-                ob_end_clean();
-
-                return $page;
+                $$key = $val;
             }
-            else
-            {
-                return $this->content;
-            }
+
+            include($contentFile);
+
+            $page = ob_get_contents();
+
+            ob_end_clean();
+
+            return $page;
+        }
+        else
+        {
+            return $this->content;
         }
     }
 
@@ -89,9 +86,15 @@ class Views
     {
         ob_start();
 
-        $this->loadContent();
-
-        $page = ob_get_contents();
+        if($this->canRender())
+        {
+            $this->loadContent();
+            $page = ob_get_contents();
+        }
+        else
+        {
+            $page = $this->getContent();
+        }
 
         ob_end_clean();
 

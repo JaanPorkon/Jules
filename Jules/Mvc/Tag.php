@@ -97,11 +97,13 @@ class Tag
         return '</form>';
     }
 
-    public function textArea($name, $value = '', $options = array('cols' => null, 'rows' => null))
+    public function textArea($name, $value = '', $options = array('cols' => null, 'rows' => null, 'style' => null, 'class' => null))
     {
-        return '<textarea name="'.$name.'"'
-            .(!is_null($options['cols']) ? ' cols="'.$options['cols'].'"' : '')
-            .(!is_null($options['rows']) ? ' rows="'.$options['rows'].'"' : '')
+        return '<textarea id="'.$name.'" name="'.$name.'"'
+            .(!is_null(@$options['cols']) ? ' cols="'.$options['cols'].'"' : '')
+            .(!is_null(@$options['rows']) ? ' rows="'.$options['rows'].'"' : '')
+            .(!is_null(@$options['style']) ? ' style="'.$options['style'].'"' : '')
+            .(!is_null(@$options['class']) ? ' class="'.$options['class'].'"' : '')
         .'>'.$value.'</textarea>';
     }
 
@@ -120,7 +122,19 @@ class Tag
         $this->selectDefault[$name] = $value;
     }
 
-    public function select($name, $value = array(), $options = array('useEmpty' => false, 'emptyText' => 'Choose...', 'emptyValue' => ''))
+    private function buildSelectValues($data, $value, $text)
+    {
+        $response = array();
+
+        foreach($data as $row)
+        {
+            $response[$row->getVar($value)] = $row->getVar($text);
+        }
+
+        return $response;
+    }
+
+    public function select($name, $data = array('data' => null, 'value' => null, 'text' => null), $options = array('useEmpty' => false, 'emptyText' => 'Choose...', 'emptyValue' => ''))
     {
         $selectedValue = (isset($this->selectDefault[$name]) ? $this->selectDefault[$name] : false);
 
@@ -131,9 +145,17 @@ class Tag
             $select .= '<option value="'.$options['emptyValue'].'"'.($selectedValue ? '' : ' selected="selected"').' disabled>'.$options['emptyText'].'</option>';
         }
 
-        foreach($value as $key => $val)
+        if(isset($data['data'][0]))
         {
-            if($value == $selectedValue)
+            if(get_class($data['data'][0]) == 'Jules\Mvc\ModelObject')
+            {
+                $data = $this->buildSelectValues($data['data'], $data['value'], $data['text']);
+            }
+        }
+
+        foreach($data as $key => $val)
+        {
+            if($key == $selectedValue)
             {
                 $select .= '<option value="'.$key.'" selected="selected">'.$val.'</option>';
             }

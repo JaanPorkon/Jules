@@ -15,4 +15,9 @@ class Response
 
         header('Location: '.$Jules_url->buildUrl($url));
     }
+
+    public function contentType($string)
+    {
+        header('Content-type: '.$string);
+    }
 }
